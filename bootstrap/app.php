@@ -6,6 +6,7 @@ use App\Http\Middleware\EnsureUserIsActive;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -16,6 +17,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Trust the reverse proxy (Render/nginx) so X-Forwarded-Proto=https is
+        // honored. Without this, the app thinks requests are http behind the
+        // load balancer and emits http:// asset URLs that the browser blocks
+        // as mixed content on an https page.
+        $middleware->trustProxies(at: '*', headers: Request::HEADER_X_FORWARDED_FOR |
+            Request::HEADER_X_FORWARDED_HOST |
+            Request::HEADER_X_FORWARDED_PORT |
+            Request::HEADER_X_FORWARDED_PROTO |
+            Request::HEADER_X_FORWARDED_AWS_ELB);
+
         // Register role-guard alias so routes can use middleware('role:admin') etc.
         $middleware->alias([
             'role' => EnsureHasRole::class,
