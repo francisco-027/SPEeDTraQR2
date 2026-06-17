@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import "tailwindcss";
+
+@layer components {
+    /* LOGIN PAGE DESIGN */
+    .auth-logo {
+        @apply block w-[220px] mx-auto;
+    }
+
+    .auth-heading {
+        @apply !text-3xl text-center font-black text-[#245501];
+    }
+
+    .auth-subheading {
+        @apply !text-lg text-center;
+    }
+
+    .form-label {
+        @apply !text-base;
+    }
+
+    .form-input {
+        @apply !text-base;
+    }
+
+    .pass-toggle {
+        @apply !text-base;
+    }
+
+    .checkbox {
+        @apply !w-5 !h-5 rounded-xl border-[#245501] text-[#245501] focus:ring-[#245501];
+    }
+
+    .auth-link {
+        @apply !text-base;
+    }
+
+    .auth-button {
+        @apply !text-base;
+    }
+
+    .switch-link {
+        @apply !text-base !text-center;
+    }
+
+    /* DASHBOARD */
+    .nav-bar {
+        @apply bg-emerald-100 rounded-r-[20px]
+    }
+
+    .nav-icon {
+        @apply h-[40px] w-[40px];
+    }
+}
+
+/* Sidebar nav scrolls when it doesn't fit, but without a visible scrollbar */
+.nav-scroll {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.nav-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+/* Sidebar pinned (expanded) state — labels visible and left-aligned without
+   relying on hover, so it works on touch devices. Higher specificity than the
+   Tailwind utilities it overrides, so no !important needed. */
+aside.sidebar-pinned {
+    width: 16rem;
+}
+
+.sidebar-pinned .nav-text {
+    max-width: 240px;
+    opacity: 1;
+}
+
+.sidebar-pinned .nav-link,
+.sidebar-pinned .nav-brand {
+    justify-content: flex-start;
+    gap: 0.75rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+}
