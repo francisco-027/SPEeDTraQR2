@@ -1,0 +1,54 @@
+Test Case Scenario ID,Name of the Module Function,Test Case Scenario,Action,Actual Input,Product Quality Component
+,AUTHENTICATION MODULE,,,,
+DOC-001,Authentication Module,User navigates to sign in form,"Tap/click the Sign In button from the welcome screen",Tap sign in button,Usability
+DOC-002,Authentication Module,User logs in with valid credentials,"Enter email and password, tap Login","Email, Password",Functional Suitability
+DOC-003,Authentication Module,User logs in with invalid credentials,"Enter wrong email/password, tap Login","Invalid Email, Wrong Password",Security
+DOC-004,Authentication Module,User logs out of the system,Tap the Logout button,Tap logout,Security
+DOC-005,Authentication Module,User requests a password reset link,"Enter registered email, tap Send Reset Link",Email,Security
+DOC-006,Authentication Module,User resets password via emailed link,"Open reset link, enter new password + confirmation","New Password, Confirm Password",Security
+DOC-007,Authentication Module,User verifies email address,Open verification link sent to email,Tap verification link,Security
+DOC-008,Authentication Module,User confirms password before sensitive action,Re-enter current password when prompted,Password,Security
+,USER / PROFILE MANAGEMENT,,,,
+DOC-009,Profile Management,User updates profile details,"Edit name/email on profile page, tap Save","Name, Email",Functional Suitability
+DOC-010,Profile Management,User changes account password,"Enter current + new password, tap Update","Current Password, New Password, Confirm",Security
+DOC-011,Profile Management,User deletes own account,"Confirm with password, tap Delete Account",Password,Security
+,ADMIN - USER MANAGEMENT,,,,
+DOC-012,User Management (Admin),Admin views list of users,Open Users page from admin menu,Tap Users,Functional Suitability
+DOC-013,User Management (Admin),Admin creates a new staff user,"Fill create-user form, assign role + department, Save","Name, Email, Password, Role, Department",Functional Suitability
+DOC-014,User Management (Admin),Admin edits an existing user,"Open user, change details, tap Update","Name, Email, Role, Department",Functional Suitability
+DOC-015,User Management (Admin),Admin activates/deactivates a user,Toggle the Active switch on a user,Tap toggle active,Security
+,ADMIN - DEPARTMENT MANAGEMENT,,,,
+DOC-016,Department Management (Admin),Admin views all departments,Open Departments page,Tap Departments,Functional Suitability
+DOC-017,Department Management (Admin),Admin creates a new department,"Fill create form, tap Save","Department Name, SLA Hours",Functional Suitability
+DOC-018,Department Management (Admin),Admin edits a department,"Open department, edit, tap Update","Department Name, SLA Hours",Functional Suitability
+DOC-019,Department Management (Admin),Admin deletes a department,"Tap Delete, confirm",Tap delete,Reliability
+,ADMIN - AUDIT & DASHBOARD,,,,
+DOC-020,Audit Log (Admin),Admin views system activity/audit log,Open Audit Log page,Tap Audit Log,Security
+DOC-021,Admin Dashboard,Admin views org-wide dashboard,Open Admin Dashboard,Tap Dashboard,Functional Suitability
+,DOCUMENT MANAGEMENT,,,,
+DOC-022,Document Creation,Staff creates a new document,"Fill create-document form, tap Submit","Document Type, Sender, Subject, Department",Functional Suitability
+DOC-023,Document Creation,System generates a QR tracking number,Auto-generated on document save,(automatic),Security
+DOC-024,Document Creation,Staff views the created-document confirmation,View success page after creation,Tap Submit,Usability
+DOC-025,Document Management,Staff edits document details,"Open document, edit fields, tap Update","Document Type, Sender, Subject",Functional Suitability
+DOC-026,Document Management,Staff prints the QR sticker,Tap Print Sticker on a document,Tap print sticker,Compatibility
+DOC-027,Document Management,Staff marks a document as complete,Tap Mark Complete on a document,Tap complete,Functional Suitability
+DOC-028,Document Attachment,Staff uploads an attachment to a document,"Choose file, tap Upload",File (PDF/Image),Security
+DOC-029,Document Attachment,Staff views/downloads an attachment,Tap an attachment link,Tap attachment,Security
+,SCANNING MODULE,,,,
+DOC-030,Scanning Module,Staff opens the QR scanner,Open Scan page,Tap Scan,Compatibility
+DOC-031,Scanning Module,Staff scans a document IN (check-in),"Scan QR / enter tracking number, action = IN",QR Code / Tracking Number,Functional Suitability
+DOC-032,Scanning Module,Staff scans a document OUT (release),"Scan QR, action = OUT, route to next department","QR Code, Next Department",Functional Suitability
+DOC-033,Scanning Module,Staff undoes the last scan,Tap Undo Last Scan on a document,Tap undo,Reliability
+,PUBLIC TRACKING (CITIZEN),,,,
+DOC-034,Public Tracking,Citizen searches for a document,"Enter tracking number, tap Track",Tracking Number,Functional Suitability
+DOC-035,Public Tracking,Citizen views document status & history,Open tracking page,Tracking Number,Usability
+DOC-036,Public Tracking,Status auto-refreshes (live polling),Page polls status every 30s,(automatic),Performance Efficiency
+DOC-037,Citizen Upload,Citizen uploads a supporting document,"Choose file on tracking page, tap Upload","File, Tracking Number",Security
+DOC-038,AI Assistant,Citizen asks a question about their document,"Type question, tap Ask","Question text, Tracking Number",Functional Suitability
+,"DASHBOARD, REPORTS & HISTORY",,,,
+DOC-039,Dashboard,Staff views the main dashboard,Open Dashboard,Tap Dashboard,Usability
+DOC-040,Analytics / Reports,Staff views analytics & charts,Open Analytics page,Tap Analytics,Performance Efficiency
+DOC-041,Movements,Staff views in-transit document movements,Open Movements page,Tap Movements,Functional Suitability
+DOC-042,History,Staff views document history log,Open History page,Tap History,Functional Suitability
+DOC-043,History Export,Staff exports history report,Tap Export on History page,Tap export,Compatibility
+DOC-044,Notifications,Staff marks a notification as read,Tap a notification,Tap notification,Usability
