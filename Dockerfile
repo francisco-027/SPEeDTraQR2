@@ -36,7 +36,11 @@ RUN npm ci --ignore-scripts
 
 COPY . .
 
-RUN composer dump-autoload --optimize --no-dev \
+# --no-scripts: do NOT run `artisan package:discover` here. The build has no .env,
+# no database, and only prod deps — running artisan now is the usual cause of
+# "post-autoload-dump returned error code 1". Discovery + caching happen at
+# startup (start-web.sh) where the real environment exists.
+RUN composer dump-autoload --optimize --no-dev --no-scripts \
     && npm run build \
     && rm -rf node_modules \
     && chown -R www-data:www-data storage bootstrap/cache
