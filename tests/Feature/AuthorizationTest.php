@@ -23,8 +23,11 @@ class AuthorizationTest extends TestCase
     {
         $this->seedRolesAndPermissions();
 
-        $this->actingAs($this->userWithRole('staff'))->get(route('documents.create'))->assertOk();
-        $this->actingAs($this->userWithRole('department_admin'))->get(route('documents.create'))->assertOk();
+        // The submission form is now a modal in the layout; documents.create
+        // redirects to the dashboard (which auto-opens the modal) for roles that
+        // may create, and is forbidden for roles that may not.
+        $this->actingAs($this->userWithRole('staff'))->get(route('documents.create'))->assertRedirect(route('dashboard'));
+        $this->actingAs($this->userWithRole('department_admin'))->get(route('documents.create'))->assertRedirect(route('dashboard'));
 
         $this->actingAs($this->userWithRole('receiving_staff'))->get(route('documents.create'))->assertForbidden();
         $this->actingAs($this->userWithRole('super_admin'))->get(route('documents.create'))->assertForbidden();

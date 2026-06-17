@@ -16,7 +16,13 @@ class HistoryController extends Controller
 
         $this->applyFilters($query, $request);
 
-        $documents = $query->latest('created_at')->paginate(15);
+        $documents = $query->latest('created_at')->paginate(15)->withQueryString();
+
+        // Live search/filter fetch: return only the results table + pagination.
+        if ($request->boolean('partial')) {
+            return view('history._table', compact('documents'));
+        }
+
         $documentTypes = $this->scopeDocuments(Document::query())->distinct()->pluck('document_type');
         $statuses = ['pending', 'in_transit', 'completed', 'returned'];
 

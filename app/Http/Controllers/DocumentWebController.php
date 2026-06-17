@@ -3,12 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\StoresDocumentAttachments;
-use App\Models\Department;
 use App\Models\Document;
 use App\Models\DocumentScan;
-use App\Models\RoutingRule;
 use App\Services\QrCodeService;
 use App\Support\DepartmentScope;
+use App\Support\DocumentFormOptions;
 use Illuminate\Http\Request;
 
 class DocumentWebController extends Controller
@@ -21,38 +20,11 @@ class DocumentWebController extends Controller
     {
         $this->ensureCanCreate();
 
-        $documentTypes = Document::query()
-            ->whereNotNull('document_type')
-            ->distinct()
-            ->orderBy('document_type')
-            ->pluck('document_type');
-
-        $categoryOptions = $this->categoryOptions();
-
-        $departments = Department::orderBy('name')->get();
-
-        $defaultRoutesByType = RoutingRule::with(['fromDepartment', 'toDepartment'])
-            ->orderBy('document_type')
-            ->orderBy('step_order')
-            ->get()
-            ->groupBy('document_type')
-            ->map(function ($rules) {
-                $chain = collect([$rules->first()->fromDepartment?->id]);
-                foreach ($rules as $rule) {
-                    if ($rule->toDepartment) {
-                        $chain->push($rule->toDepartment->id);
-                    }
-                }
-
-                return $chain->filter()->unique()->values()->all();
-            });
-
-        return view('documents.create', compact(
-            'documentTypes',
-            'categoryOptions',
-            'departments',
-            'defaultRoutesByType'
-        ));
+        // The submission form is now a modal that lives in the layout. The old
+        // standalone page is gone, so this route just lands the user on their
+        // dashboard with a flash that auto-opens the modal (no-JS friendly:
+        // the modal renders open server-side when this flash is present).
+        return redirect()->route('dashboard')->with('open_new_submission', true);
     }
 
     public function store(Request $request)
@@ -127,6 +99,12 @@ class DocumentWebController extends Controller
             'remarks' => 'Document received',
             'synced' => true,
         ]);
+
+        // Modal (fetch) submit: tell the JS where to lift the "Document Created"
+        // card from. Plain submit: full-page redirect to the created page.
+        if ($request->expectsJson()) {
+            return response()->json(['redirect' => route('documents.created', $document)]);
+        }
 
         return redirect()->route('documents.created', $document);
     }
@@ -206,16 +184,7 @@ class DocumentWebController extends Controller
 
     private function categoryOptions(): array
     {
-        return [
-            'Business Permit',
-            'Barangay Clearance',
-            'Building Permit',
-            "Mayor's Permit",
-            'Real Property Tax',
-            'Birth Certificate Request',
-            'Community Tax Certificate',
-            'Other',
-        ];
+        return DocumentFormOptions::categoryOptions();
     }
 
     private function ensureCanCreate(): void

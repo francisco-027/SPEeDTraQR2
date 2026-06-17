@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Department;
 use App\Models\User;
 use App\Support\DepartmentScope;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
@@ -17,7 +18,8 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        $query = User::with(['roles', 'department'])->orderBy('name');
+        // withTrashed so archived (soft-deleted) users remain visible with a badge.
+        $query = User::withTrashed()->with(['roles', 'department'])->orderBy('name');
 
         if ($this->isDeptAdmin()) {
             $query->where('department_id', $this->authDeptId())
@@ -38,7 +40,15 @@ class UserController extends Controller
         $users = $query->paginate(20)->withQueryString();
         $roles = $this->assignableRoles();
 
-        return view('admin.users.index', compact('users', 'roles'));
+        // Live-search/filter fetch: return only the results table + pagination.
+        if ($request->boolean('partial')) {
+            return view('admin.users._table', compact('users'));
+        }
+
+        $departments = $this->assignableDepartments();
+        $deptLocked = $this->isDeptAdmin();
+
+        return view('admin.users.index', compact('users', 'roles', 'departments', 'deptLocked'));
     }
 
     public function create()
@@ -138,6 +148,48 @@ class UserController extends Controller
         $action = $user->is_active ? 'activated' : 'deactivated';
 
         return back()->with('success', "Account for {$user->name} has been {$action}.");
+    }
+
+    /** Archive (soft-delete). The user can no longer log in until restored. */
+    public function archive(User $user)
+    {
+        $this->authorizeDeptAccess($user);
+
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'You cannot archive your own account.');
+        }
+
+        $user->delete();
+
+        return back()->with('success', "{$user->name} has been archived and can no longer sign in.");
+    }
+
+    /** Restore an archived (soft-deleted) user. */
+    public function restore(User $user)
+    {
+        $this->authorizeDeptAccess($user);
+
+        $user->restore();
+
+        return back()->with('success', "{$user->name} has been restored.");
+    }
+
+    /** Permanently delete an archived user (only if no FK-restricted activity). */
+    public function forceDelete(User $user)
+    {
+        $this->authorizeDeptAccess($user);
+
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'You cannot delete your own account.');
+        }
+
+        try {
+            $user->forceDelete();
+        } catch (QueryException $e) {
+            return back()->with('error', "{$user->name} has document activity on record and can't be permanently deleted. Keep them archived instead.");
+        }
+
+        return back()->with('success', "{$user->name} has been permanently deleted.");
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────

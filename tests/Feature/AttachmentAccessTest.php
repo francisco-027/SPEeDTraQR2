@@ -16,11 +16,11 @@ class AttachmentAccessTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function makeAttachment(Department $dept): DocumentAttachment
+    private function makeAttachment(Department $dept, ?User $creator = null): DocumentAttachment
     {
         Storage::fake('local');
 
-        $creator = User::factory()->create(['department_id' => $dept->id]);
+        $creator ??= User::factory()->create(['department_id' => $dept->id]);
 
         $document = Document::create([
             'tracking_number' => 'SPD-ATTACH-'.uniqid(),
@@ -66,6 +66,22 @@ class AttachmentAccessTest extends TestCase
         $this->actingAs($outsider)
             ->get(route('attachments.show', $attachment))
             ->assertForbidden();
+    }
+
+    public function test_creator_can_view_attachment_even_from_another_department(): void
+    {
+        Role::firstOrCreate(['name' => 'staff', 'guard_name' => 'web']);
+        $deptA = Department::create(['name' => 'Accounting', 'sla_hours' => 48]);
+        $deptB = Department::create(['name' => 'Engineering', 'sla_hours' => 48]);
+
+        // Creator belongs to dept B; the document lives in dept A and never
+        // routes through B — only the "creator always has access" rule applies.
+        $creator = User::factory()->create(['department_id' => $deptB->id])->assignRole('staff');
+        $attachment = $this->makeAttachment($deptA, $creator);
+
+        $this->actingAs($creator)
+            ->get(route('attachments.show', $attachment))
+            ->assertOk();
     }
 
     public function test_guests_cannot_view_attachments(): void

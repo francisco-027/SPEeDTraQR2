@@ -47,12 +47,21 @@
 
     /* DASHBOARD */
     .nav-bar {
-        @apply bg-[#E4FCC8] rounded-r-[20px]
+        @apply bg-emerald-100 rounded-r-[20px]
     }
 
     .nav-icon {
         @apply h-[40px] w-[40px];
     }
+}
+
+/* Keep the sidebar nav scrollable but hide its scrollbar for a cleaner rail. */
+.nav-bar nav {
+    scrollbar-width: none;       /* Firefox */
+    -ms-overflow-style: none;    /* old Edge/IE */
+}
+.nav-bar nav::-webkit-scrollbar {
+    display: none;               /* Chrome/Safari */
 }
 
 /* Sidebar pinned (expanded) state — labels visible and left-aligned without

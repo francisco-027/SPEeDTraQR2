@@ -1,17 +1,4 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h1 class="text-3xl font-bold tracking-tight text-emerald-950 sm:text-4xl">Departments</h1>
-            <a href="{{ route('admin.departments.create') }}"
-               class="inline-flex items-center gap-2 rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800">
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                </svg>
-                Add Department
-            </a>
-        </div>
-    </x-slot>
-
     <div class="mx-auto max-w-5xl space-y-6">
 
         @if(session('success'))
@@ -75,4 +62,29 @@
 
         {{ $departments->links() }}
     </div>
+
+    {{-- Add Department modal (navbar button opens it; create page is the no-JS fallback) --}}
+    <x-modal name="add-department-modal" :show="$errors->any() && old('_form') === 'add-department'" focusable maxWidth="xl">
+        <form method="POST" action="{{ route('admin.departments.store') }}" class="space-y-5 p-6">
+            <div class="flex items-center justify-between">
+                <h2 class="text-base font-semibold text-gray-800">Department Details</h2>
+                <button type="button" x-on:click="$dispatch('close')" class="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600" aria-label="Close">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            @include('admin.departments._form')
+
+            <div class="flex items-center justify-end gap-3 border-t border-gray-100 pt-4">
+                <button type="button" x-on:click="$dispatch('close')"
+                        class="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-600 transition hover:bg-gray-50">
+                    Cancel
+                </button>
+                <button type="submit"
+                        class="rounded-xl bg-emerald-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800">
+                    Create Department
+                </button>
+            </div>
+        </form>
+    </x-modal>
 </x-app-layout>

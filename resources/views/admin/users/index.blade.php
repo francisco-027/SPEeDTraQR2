@@ -1,17 +1,4 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h1 class="text-3xl font-bold tracking-tight text-emerald-950 sm:text-4xl">Users</h1>
-            <a href="{{ route('admin.users.create') }}"
-               class="inline-flex items-center gap-2 rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800">
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                </svg>
-                Add User
-            </a>
-        </div>
-    </x-slot>
-
     <div class="mx-auto max-w-7xl space-y-6">
 
         @if(session('success'))
@@ -25,12 +12,12 @@
             </div>
         @endif
 
-        {{-- Filters --}}
-        <form method="GET" class="flex flex-wrap gap-3">
-            <input type="text" name="search" value="{{ request('search') }}"
-                   placeholder="Search name or email…"
+        {{-- Filters (plain submit works without JS; JS upgrades to live search) --}}
+        <form method="GET" id="users-filter" class="flex flex-wrap gap-3">
+            <input type="text" name="search" id="users-search" value="{{ request('search') }}"
+                   placeholder="Search name or email…" autocomplete="off"
                    class="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm shadow-sm focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 min-w-[200px]">
-            <select name="role" class="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm shadow-sm focus:border-emerald-400 focus:outline-none">
+            <select name="role" id="users-role" class="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm shadow-sm focus:border-emerald-400 focus:outline-none">
                 <option value="">All Roles</option>
                 @foreach($roles as $role)
                     <option value="{{ $role->name }}" @selected(request('role') === $role->name)>
@@ -48,82 +35,70 @@
             @endif
         </form>
 
-        {{-- Table --}}
-        <div class="overflow-hidden rounded-2xl border border-gray-200/90 bg-white shadow-md">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Name</th>
-                            <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Email</th>
-                            <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Role</th>
-                            <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Department</th>
-                            <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Status</th>
-                            <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100 bg-white">
-                        @forelse($users as $user)
-                            <tr class="hover:bg-gray-50/60 transition {{ ! $user->is_active ? 'opacity-60' : '' }}">
-                                <td class="px-4 py-3">
-                                    <div class="flex items-center gap-3">
-                                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-800">
-                                            {{ strtoupper(mb_substr($user->name, 0, 1)) }}
-                                        </span>
-                                        <span class="text-sm font-semibold text-gray-800">{{ $user->name }}</span>
-                                    </div>
-                                </td>
-                                <td class="px-4 py-3 text-sm text-gray-600">{{ $user->email }}</td>
-                                <td class="px-4 py-3">
-                                    @foreach($user->roles as $role)
-                                        <span class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800">
-                                            {{ ucfirst($role->name) }}
-                                        </span>
-                                    @endforeach
-                                </td>
-                                <td class="px-4 py-3 text-sm text-gray-600">{{ $user->department->name ?? '—' }}</td>
-                                <td class="px-4 py-3">
-                                    @if($user->is_active)
-                                        <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-700">
-                                            <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span> Active
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-500">
-                                            <span class="h-1.5 w-1.5 rounded-full bg-gray-400"></span> Inactive
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="px-4 py-3">
-                                    <div class="flex items-center gap-2">
-                                        <a href="{{ route('admin.users.edit', $user) }}"
-                                           class="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-50">
-                                            Edit
-                                        </a>
-                                        @if($user->id !== auth()->id())
-                                            <form method="POST" action="{{ route('admin.users.toggle-active', $user) }}">
-                                                @csrf @method('PATCH')
-                                                <button type="submit"
-                                                        class="rounded-lg border px-3 py-1.5 text-xs font-semibold transition
-                                                            {{ $user->is_active
-                                                                ? 'border-red-200 bg-red-50 text-red-600 hover:bg-red-100'
-                                                                : 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100' }}">
-                                                    {{ $user->is_active ? 'Deactivate' : 'Activate' }}
-                                                </button>
-                                            </form>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="px-4 py-10 text-center text-sm text-gray-400">No users found.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+        <div id="users-results">
+            @include('admin.users._table')
         </div>
-
-        {{ $users->links() }}
     </div>
+
+    {{-- Add User modal (navbar button opens it; create page is the no-JS fallback) --}}
+    <x-modal name="add-user-modal" :show="$errors->any() && old('_form') === 'add-user'" focusable maxWidth="2xl">
+        <form method="POST" action="{{ route('admin.users.store') }}" class="space-y-5 p-6">
+            <div class="flex items-center justify-between">
+                <h2 class="text-base font-semibold text-gray-800">New User Account</h2>
+                <button type="button" x-on:click="$dispatch('close')" class="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600" aria-label="Close">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            @include('admin.users._form')
+
+            <div class="flex items-center justify-end gap-3 border-t border-gray-100 pt-4">
+                <button type="button" x-on:click="$dispatch('close')"
+                        class="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-600 transition hover:bg-gray-50">
+                    Cancel
+                </button>
+                <button type="submit"
+                        class="rounded-xl bg-emerald-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800">
+                    Create User
+                </button>
+            </div>
+        </form>
+    </x-modal>
+
+    <script>
+        (function () {
+            const form = document.getElementById('users-filter');
+            const search = document.getElementById('users-search');
+            const role = document.getElementById('users-role');
+            const results = document.getElementById('users-results');
+            if (!form || !results) return;
+
+            let timer = null;
+
+            async function refresh() {
+                const params = new URLSearchParams();
+                if (search.value) params.set('search', search.value);
+                if (role.value) params.set('role', role.value);
+
+                // Reflect the current filters in the URL (no reload).
+                const qs = params.toString();
+                history.replaceState(null, '', qs ? `?${qs}` : location.pathname);
+
+                params.set('partial', '1');
+                try {
+                    const res = await fetch(`{{ route('admin.users.index') }}?${params.toString()}`, {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    });
+                    if (res.ok) results.innerHTML = await res.text();
+                } catch (e) { /* keep current results on network error */ }
+            }
+
+            form.addEventListener('submit', (e) => { e.preventDefault(); refresh(); });
+            search.addEventListener('input', () => {
+                clearTimeout(timer);
+                timer = setTimeout(refresh, 300);
+            });
+            role.addEventListener('change', refresh);
+        })();
+    </script>
 </x-app-layout>

@@ -7,15 +7,12 @@
     };
 @endphp
 <x-app-layout>
-    <x-slot name="header">
-        <h1 class="text-3xl font-bold tracking-tight text-emerald-950 sm:text-4xl">Track Document</h1>
-    </x-slot>
-
-    <div class="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
+    <div class="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 sm:px-6 lg:h-[calc(100vh-6rem)] lg:grid-cols-2 lg:px-8">
         @unless($isPublicView)
-            <div class="rounded-xl border border-[#e0e0e0] bg-white p-3">
-                <div class="max-h-[520px] space-y-2 overflow-y-auto pr-1">
-                    @foreach($documents as $item)
+            <div class="flex flex-col rounded-xl border border-[#e0e0e0] bg-white p-3 lg:min-h-0 lg:overflow-hidden">
+                <p class="mb-2 shrink-0 px-1 text-xs font-semibold uppercase tracking-wide text-emerald-700/70">In-progress documents</p>
+                <div class="space-y-2 overflow-y-auto pr-1 lg:min-h-0 lg:flex-1">
+                    @forelse($documents as $item)
                         <a href="{{ route('track.show', $item->tracking_number) }}" class="flex items-center justify-between rounded-lg border p-3 {{ $item->tracking_number === $document->tracking_number ? 'border-[#1a5c1a] bg-[#e8f5e9]' : 'border-[#e0e0e0] bg-white hover:bg-[#f4faf4]' }}">
                             <div class="flex items-center gap-3">
                                 <span class="flex h-11 w-11 items-center justify-center rounded-full bg-[#c8efcc] text-[#1a5c1a]">
@@ -31,12 +28,14 @@
                                 <span class="text-xl text-[#666666]">›</span>
                             </div>
                         </a>
-                    @endforeach
+                    @empty
+                        <p class="px-2 py-6 text-center text-sm text-gray-400">No other in-progress documents.</p>
+                    @endforelse
                 </div>
             </div>
         @endunless
 
-        <div class="rounded-xl border border-[#e0e0e0] bg-white p-6 {{ $isPublicView ? 'lg:col-span-2' : '' }}">
+        <div class="rounded-xl border border-[#e0e0e0] bg-white p-6 {{ $isPublicView ? 'lg:col-span-2' : 'lg:min-h-0 lg:overflow-y-auto' }}">
             <div class="flex items-start justify-between">
                 <div class="flex items-center gap-3">
                     <span class="flex h-14 w-14 items-center justify-center rounded-full bg-[#c8efcc] text-[#1a5c1a]">

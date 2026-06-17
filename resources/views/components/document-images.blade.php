@@ -22,7 +22,7 @@
                     : ($img->url ?? null);
             @endphp
             @if($url)
-                <a href="{{ $url }}" target="_blank" rel="noopener"
+                <a href="{{ $url }}" target="_blank" rel="noopener" data-image-view
                    class="block overflow-hidden rounded-lg ring-1 ring-gray-200 transition hover:ring-emerald-400"
                    title="Open full image">
                     <img src="{{ $url }}" alt="Document attachment" class="{{ $thumbClass }} object-cover bg-gray-100"

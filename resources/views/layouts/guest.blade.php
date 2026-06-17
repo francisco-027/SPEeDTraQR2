@@ -44,10 +44,10 @@
             }
 
             .auth-card {
-                width: min(980px, 100%);
+                width: min(780px, 100%);
                 background: var(--card-bg);
-                border-radius: 8px;
-                box-shadow: 0 15px 35px rgba(91, 128, 71, 0.25);
+                border-radius: 10px;
+                box-shadow: 0 12px 30px rgba(91, 128, 71, 0.22);
                 overflow: hidden;
             }
 
@@ -57,7 +57,7 @@
             }
 
             .auth-left {
-                padding: 48px;
+                padding: 32px 28px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -68,19 +68,27 @@
                 text-align: center;
             }
 
+            .auth-logo {
+                display: block;
+                width: 220px;
+                max-width: 100%;
+                height: auto;
+                margin: 0 auto 16px;
+            }
+
             .brand-badge {
-                width: 64px;
-                height: 64px;
-                margin: 0 auto 20px;
+                width: 56px;
+                height: 56px;
+                margin: 0 auto 16px;
                 border-radius: 50%;
                 border: 4px solid #3f8f32;
             }
 
             .brand-title {
                 margin: 0;
-                font-size: 50px;
+                font-size: 30px;
                 font-weight: 700;
-                line-height: 1;
+                line-height: 1.05;
                 color: #3f8f32;
             }
 
@@ -89,43 +97,43 @@
             }
 
             .brand-subtitle {
-                margin-top: 14px;
+                margin-top: 10px;
                 color: #6c7f5e;
-                font-size: 16px;
+                font-size: 13px;
             }
 
             .auth-right {
-                padding: 44px 40px;
+                padding: 32px 30px;
             }
 
             .auth-heading {
                 margin: 0;
-                font-size: 52px;
-                line-height: 1;
+                font-size: 30px;
+                line-height: 1.05;
                 font-weight: 700;
                 color: var(--text-main);
             }
 
             .auth-subheading {
-                margin-top: 8px;
-                font-size: 36px;
+                margin-top: 6px;
+                font-size: 16px;
                 color: var(--text-main);
                 font-weight: 600;
             }
 
             .auth-form {
-                margin-top: 28px;
+                margin-top: 22px;
             }
 
-            .form-group { margin-bottom: 18px; }
+            .form-group { margin-bottom: 14px; }
 
             .form-label {
                 display: block;
-                font-size: 30px;
-                font-weight: 500;
+                font-size: 13px;
+                font-weight: 600;
+                letter-spacing: .04em;
                 color: var(--text-main);
-                margin-bottom: 8px;
-                letter-spacing: .01em;
+                margin-bottom: 6px;
             }
 
             .form-input {
@@ -133,8 +141,8 @@
                 border-radius: 7px;
                 border: 1px solid var(--input-border);
                 background: var(--input-bg);
-                padding: 13px 14px;
-                font-size: 26px;
+                padding: 10px 12px;
+                font-size: 15px;
                 color: #355c2f;
                 outline: none;
             }
@@ -148,8 +156,8 @@
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                gap: 14px;
-                margin: 14px 0 20px;
+                gap: 12px;
+                margin: 12px 0 18px;
             }
 
             .checkbox-wrap {
@@ -157,14 +165,14 @@
                 align-items: center;
                 gap: 8px;
                 color: var(--text-main);
-                font-size: 30px;
+                font-size: 13px;
             }
 
-            .checkbox-wrap input { width: 20px; height: 20px; }
+            .checkbox-wrap input { width: 16px; height: 16px; }
 
             .auth-link {
                 color: var(--text-main);
-                font-size: 30px;
+                font-size: 13px;
                 text-decoration: none;
             }
 
@@ -176,8 +184,8 @@
                 border-radius: 7px;
                 background: linear-gradient(90deg, #2ea04b 0%, #77b53f 100%);
                 color: #fff;
-                padding: 14px 16px;
-                font-size: 30px;
+                padding: 11px 16px;
+                font-size: 16px;
                 font-weight: 600;
                 cursor: pointer;
             }
@@ -186,9 +194,9 @@
 
             .switch-link {
                 display: inline-block;
-                margin-top: 16px;
+                margin-top: 14px;
                 color: var(--text-sub);
-                font-size: 22px;
+                font-size: 13px;
                 text-decoration: none;
             }
 
@@ -200,7 +208,7 @@
                 gap: 12px;
                 margin: 16px 0 12px;
                 color: #8ca07e;
-                font-size: 18px;
+                font-size: 13px;
             }
 
             .auth-divider::before,
@@ -218,8 +226,8 @@
                 border-radius: 7px;
                 background: transparent;
                 color: #2d7a2a;
-                padding: 12px 16px;
-                font-size: 26px;
+                padding: 10px 16px;
+                font-size: 15px;
                 font-weight: 600;
                 text-align: center;
                 text-decoration: none;
@@ -237,12 +245,12 @@
                 .auth-left {
                     border-right: 0;
                     border-bottom: 1px solid #d8e8c0;
-                    padding: 30px 22px;
+                    padding: 26px 22px;
                 }
-                .auth-right { padding: 26px 20px; }
-                .auth-heading { font-size: 42px; }
-                .auth-subheading { font-size: 28px; }
-                .form-label, .form-input, .checkbox-wrap, .auth-link, .auth-button { font-size: 22px; }
+                .auth-right { padding: 26px 22px; }
+                .auth-logo { width: 170px; }
+                .auth-heading { font-size: 26px; }
+                .auth-subheading { font-size: 15px; }
             }
         </style>
     </head>

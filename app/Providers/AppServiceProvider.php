@@ -9,6 +9,7 @@ use App\Support\Ai\LlmProvider;
 use App\Support\Ai\NullProvider;
 use App\Support\Ai\OllamaProvider;
 use App\Support\DepartmentScope;
+use App\Support\DocumentFormOptions;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Support\Facades\Event;
@@ -55,6 +56,22 @@ class AppServiceProvider extends ServiceProvider
             }
 
             $view->with('headerNotifications', $notifications);
+        });
+
+        // Feed the New Submission modal (included by the layout) with its form
+        // options — only for users who can actually create documents and are
+        // not org-wide system admins (who don't submit documents).
+        View::composer('layouts.app', function ($view) {
+            $user = auth()->user();
+            $canCreate = $user && $user->can('create documents') && ! $user->can('manage system');
+
+            $view->with('canCreateDocuments', $canCreate);
+
+            if ($canCreate) {
+                $view->with('docFormDepartments', DocumentFormOptions::departments());
+                $view->with('docFormDefaultRoutes', DocumentFormOptions::defaultRoutesByType());
+                $view->with('docFormCategories', DocumentFormOptions::categoryOptions());
+            }
         });
     }
 }

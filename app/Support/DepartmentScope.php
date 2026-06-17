@@ -105,6 +105,12 @@ class DepartmentScope
             return true;
         }
 
+        // The creator can always access their own document (and its attachments),
+        // regardless of where the document currently sits in the routing path.
+        if ((int) $document->created_by === (int) $user->id) {
+            return true;
+        }
+
         $deptId = self::departmentId($user);
 
         if (! $deptId) {
