@@ -20,7 +20,8 @@
                 <h2 class="text-base font-semibold text-gray-800">Account Details</h2>
             </div>
 
-            <form method="POST" action="{{ route('admin.users.update', $user) }}" class="space-y-5 p-6">
+            <div class="space-y-5 p-6">
+            <form id="user-update-form" method="POST" action="{{ route('admin.users.update', $user) }}" class="space-y-5">
                 @csrf @method('PUT')
 
                 <div>
@@ -84,18 +85,25 @@
                     </div>
                 </div>
 
+            </form>
+
+            {{-- Separate form: HTML forbids nesting forms inside the update form.
+                 The Deactivate/Activate button below targets it via the `form` attribute. --}}
+            @if($user->id !== auth()->id())
+                <form id="toggle-active-form" method="POST" action="{{ route('admin.users.toggle-active', $user) }}" class="hidden">
+                    @csrf @method('PATCH')
+                </form>
+            @endif
+
                 <div class="flex items-center justify-between border-t border-gray-100 pt-4">
                     @if($user->id !== auth()->id())
-                        <form method="POST" action="{{ route('admin.users.toggle-active', $user) }}" class="m-0">
-                            @csrf @method('PATCH')
-                            <button type="submit"
-                                    class="rounded-xl border px-4 py-2.5 text-sm font-semibold transition
-                                        {{ $user->is_active
-                                            ? 'border-red-200 bg-red-50 text-red-600 hover:bg-red-100'
-                                            : 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100' }}">
-                                {{ $user->is_active ? 'Deactivate Account' : 'Activate Account' }}
-                            </button>
-                        </form>
+                        <button type="submit" form="toggle-active-form"
+                                class="rounded-xl border px-4 py-2.5 text-sm font-semibold transition
+                                    {{ $user->is_active
+                                        ? 'border-red-200 bg-red-50 text-red-600 hover:bg-red-100'
+                                        : 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100' }}">
+                            {{ $user->is_active ? 'Deactivate Account' : 'Activate Account' }}
+                        </button>
                     @else
                         <span></span>
                     @endif
@@ -105,13 +113,13 @@
                            class="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-600 transition hover:bg-gray-50">
                             Cancel
                         </a>
-                        <button type="submit"
+                        <button type="submit" form="user-update-form"
                                 class="rounded-xl bg-emerald-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800">
                             Save Changes
                         </button>
                     </div>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </x-app-layout>
