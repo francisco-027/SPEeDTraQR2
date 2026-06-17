@@ -1,111 +1,56 @@
-# Render Blueprint for SPeEdtracQR.
-# Create the services in the dashboard via "New > Blueprint" pointing at this repo,
-# or copy the values manually. See DEPLOYMENT_RENDER.md for the full walkthrough.
+# Render Blueprint for SPeEdtracQR — FREE TIER version.
+#
+# Render's free tier only covers a Web Service + Postgres. Background Workers,
+# Cron Jobs, and Persistent Disks all require payment, so this file folds their
+# jobs into the single free web service. Tradeoffs (see DEPLOYMENT_RENDER.md):
+#   - QUEUE_CONNECTION=sync  -> jobs run inline in the request (no worker needed)
+#   - No scheduler service   -> SLA emails need an external free cron (cron-job.org)
+#   - No disk                -> uploaded files/QR are LOST on redeploy unless you
+#                               point FILESYSTEM_DISK at free S3 storage (R2/Supabase)
 
 databases:
   - name: speedtraqr-db
     databaseName: speedtraqr
     user: speedtraqr
-    plan: free          # free Postgres expires after 90 days; upgrade for real use
+    plan: free          # expires after 90 days; back up before then
 
 services:
-  # --- Web (Apache + PHP-FPM in one container) ---
   - type: web
     name: speedtraqr-web
     runtime: docker
     dockerfilePath: ./Dockerfile
-    plan: starter        # 'free' sleeps after inactivity; 'starter' stays warm
+    plan: free          # sleeps after 15 min idle; cold start ~30s
     healthCheckPath: /login
-    # Persistent disk so uploaded attachments + QR codes survive deploys.
-    # Remove this block if you switch FILESYSTEM_DISK to S3 instead.
-    disk:
-      name: storage
-      mountPath: /var/www/html/storage/app
-      sizeGB: 1
     envVars:
       - key: APP_KEY
-        sync: false              # paste `php artisan key:generate --show` output
+        sync: false              # paste `php artisan key:generate --show`
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
         value: "false"
       - key: APP_URL
-        sync: false              # set to your https://speedtraqr-web.onrender.com URL
+        sync: false              # https://speedtraqr-web.onrender.com
       - key: ADMIN_PASSWORD
         sync: false
       - key: DB_CONNECTION
         value: pgsql
-      - key: DB_URL                     # Render provides a full connection string
+      - key: DB_URL
         fromDatabase:
           name: speedtraqr-db
           property: connectionString
       - key: SESSION_DRIVER
         value: database
       - key: QUEUE_CONNECTION
-        value: database
+        value: sync              # no worker -> run jobs inline
       - key: CACHE_STORE
         value: database
       - key: FILESYSTEM_DISK
-        value: local
+        value: local             # ephemeral; switch to s3 to persist files
       - key: BROADCAST_CONNECTION
-        value: log               # live tracking off for first deploy
+        value: log
       - key: AI_PROVIDER
-        value: none              # Ollama not available on Render
-      - key: LOG_CHANNEL
-        value: stderr            # so logs show in Render dashboard
-      - key: MAIL_MAILER
-        value: log               # swap to smtp once you have a mail provider
-
-  # --- Queue worker (same image, different command) ---
-  - type: worker
-    name: speedtraqr-worker
-    runtime: docker
-    dockerfilePath: ./Dockerfile
-    plan: starter
-    dockerCommand: php artisan queue:work --tries=3 --timeout=90 --sleep=3
-    envVars:
-      - key: APP_KEY
-        sync: false
-      - key: APP_ENV
-        value: production
-      - key: APP_DEBUG
-        value: "false"
-      - key: DB_CONNECTION
-        value: pgsql
-      - key: DB_URL
-        fromDatabase:
-          name: speedtraqr-db
-          property: connectionString
-      - key: QUEUE_CONNECTION
-        value: database
-      - key: CACHE_STORE
-        value: database
+        value: none
       - key: LOG_CHANNEL
         value: stderr
       - key: MAIL_MAILER
-        value: log
-
-  # --- Scheduler (runs the SLA sweep hourly) ---
-  - type: cron
-    name: speedtraqr-scheduler
-    runtime: docker
-    dockerfilePath: ./Dockerfile
-    schedule: "0 * * * *"        # hourly, matches documents:check-sla
-    dockerCommand: php artisan schedule:run
-    envVars:
-      - key: APP_KEY
-        sync: false
-      - key: APP_ENV
-        value: production
-      - key: DB_CONNECTION
-        value: pgsql
-      - key: DB_URL
-        fromDatabase:
-          name: speedtraqr-db
-          property: connectionString
-      - key: QUEUE_CONNECTION
-        value: database
-      - key: CACHE_STORE
-        value: database
-      - key: MAIL_MAILER
-        value: log
+        value: log               # swap to smtp once you have a mail provider
