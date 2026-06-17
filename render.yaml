@@ -8,11 +8,9 @@
 #   - No disk                -> uploaded files/QR are LOST on redeploy unless you
 #                               point FILESYSTEM_DISK at free S3 storage (R2/Supabase)
 
-databases:
-  - name: speedtraqr-db
-    databaseName: speedtraqr
-    user: speedtraqr
-    plan: free          # expires after 90 days; back up before then
+# Using an EXTERNAL Supabase Postgres instead of a Render database, so there is
+# no `databases:` block here. Paste the Supabase connection string into DB_URL
+# in the Render dashboard (see below). Use the SESSION POOLER string (IPv4).
 
 services:
   - type: web
@@ -35,9 +33,9 @@ services:
       - key: DB_CONNECTION
         value: pgsql
       - key: DB_URL
-        fromDatabase:
-          name: speedtraqr-db
-          property: connectionString
+        sync: false              # paste Supabase "Session pooler" connection string
+      - key: DB_SSLMODE
+        value: require           # Supabase requires SSL
       - key: SESSION_DRIVER
         value: database
       - key: QUEUE_CONNECTION
